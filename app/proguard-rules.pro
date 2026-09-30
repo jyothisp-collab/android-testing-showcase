@@ -1,0 +1,1 @@
+-keep class com.example.androidtestingshowcase.core.network.model.** { *; }

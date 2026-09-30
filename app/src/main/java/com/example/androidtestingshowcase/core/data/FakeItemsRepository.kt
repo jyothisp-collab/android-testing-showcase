@@ -1,21 +1,37 @@
-package com.example.androidtestingshowcase.features.home
+package com.example.androidtestingshowcase.core.data
 
 import com.example.androidtestingshowcase.core.common.Result
-import com.example.androidtestingshowcase.core.data.ShowcaseItem
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 interface ItemsRepository {
     fun observeItems(): Flow<List<ShowcaseItem>>
-    suspend fun refresh(): Result<Unit>
+    suspend fun refreshItems(): Result<List<ShowcaseItem>>
 }
 
-class FakeItemsRepository : ItemsRepository {
-    private val items = listOf(
-        ShowcaseItem("1", "One", "First item", 1L),
-        ShowcaseItem("2", "Two", "Second item", 2L),
-    )
+class FakeItemsRepository(
+    private val initialItems: List<ShowcaseItem> = emptyList(),
+) : ItemsRepository {
 
-    override fun observeItems(): Flow<List<ShowcaseItem>> = flowOf(items)
-    override suspend fun refresh(): Result<Unit> = Result.Success(Unit)
+    private val _items = MutableStateFlow(initialItems)
+    val itemsFlow: Flow<List<ShowcaseItem>> = _items.asStateFlow()
+
+    override fun observeItems(): Flow<List<ShowcaseItem>> = _items.asStateFlow()
+
+    override suspend fun refreshItems(): Result<List<ShowcaseItem>> {
+        return Result.Success(_items.value)
+    }
+
+    fun setItems(items: List<ShowcaseItem>) {
+        _items.value = items
+    }
+
+    fun addItem(item: ShowcaseItem) {
+        _items.value = _items.value + item
+    }
+
+    fun clear() {
+        _items.value = emptyList()
+    }
 }

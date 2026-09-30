@@ -16,5 +16,8 @@ private val LightColors = lightColorScheme(
 
 @Composable
 fun ShowcaseTheme(content: @Composable () -> Unit) {
-    MaterialTheme(colorScheme = LightColors, content = content)
+    MaterialTheme(
+        colorScheme = LightColors,
+        content = content,
+    )
 }

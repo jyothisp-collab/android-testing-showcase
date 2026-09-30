@@ -1,12 +1,10 @@
-package com.example.androidtestingshowcase.features.home
+package com.example.androidtestingshowcase.features.items
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidtestingshowcase.core.common.Result
 import com.example.androidtestingshowcase.core.data.ItemsRepository
-import com.example.androidtestingshowcase.core.data.ShowcaseItem
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,29 +12,19 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class HomeUiState(
-    val items: List<ShowcaseItem> = emptyList(),
-    val isLoading: Boolean = true,
-    val errorMessage: String? = null,
-)
-
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class ItemsViewModel @Inject constructor(
     private val repository: ItemsRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
-    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(ItemsUiState())
+    val uiState: StateFlow<ItemsUiState> = _uiState.asStateFlow()
 
     init {
         loadItems()
     }
 
-    fun refresh() {
-        loadItems()
-    }
-
-    private fun loadItems() {
+    fun loadItems() {
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
             when (val result = repository.refreshItems()) {
@@ -57,13 +45,6 @@ class HomeViewModel @Inject constructor(
                     }
                 }
             }
-        }
-    }
-
-    companion object {
-        @JvmStatic
-        fun createWithRepository(repository: ItemsRepository): HomeViewModel {
-            return HomeViewModel(repository)
         }
     }
 }
